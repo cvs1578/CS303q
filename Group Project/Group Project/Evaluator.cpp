@@ -41,6 +41,18 @@ int Evaluator::eval(string s)
 
 		else if (s[count] == '+') // if it's a + we have to determine if it's increment
 		{
+			//We have to check to see if the one before is a arithmetic operator
+			if (count>0&&(s[count - 1] == '*' || s[count - 1] == '/' || s[count - 1] == '%' || s[count - 1] == '^'|| s[count-1] == '+' || s[count-1] == '-'))
+			{
+				error(7, count);
+				return -1;
+			}
+			//Account for Spaces
+			if (count>1 && s[count - 1] == ' ' && ((s[count - 2] == '+' || s[count - 2] == '-' || s[count - 2] == '*' || s[count - 2] == '/' || s[count - 2] == '%' || s[count - 2] == '^')))
+			{
+				error(7, count);
+				return -1;
+			}
 			if (s[count + 1] == '+')//This is increment
 			{
 				StackOperator('i', 8); //i for increment
@@ -53,6 +65,24 @@ int Evaluator::eval(string s)
 		}
 		else if (s[count] == '-') // same thing with --
 		{
+			//We have to check to see if the one before is a arithmetic operator
+			if (count>0 && (s[count - 1] == '*' || s[count - 1] == '/' || s[count - 1] == '%' || s[count - 1] == '^' || s[count - 1] == '+' || s[count - 1] == '-'))
+			{
+				if (count > 1 && ((s[count - 1] == '+' && (s[count - 2] == '+')) || (s[count - 1] == '-' && s[count - 2] == '-'))); //Keeping track of increment/decrement so it'll increment and decrement negative numbers
+				else {
+					error(7, count);
+					return -1;
+				}
+			}
+			//Account for Spaces
+			if (count>1 && s[count - 1] == ' ' && ((s[count - 2] == '+' || s[count - 2] == '-' || s[count - 2] == '*' || s[count - 2] == '/' || s[count - 2] == '%' || s[count - 2] == '^')))
+			{
+				if (count > 2 && ((s[count - 2] == '+' && (s[count - 3] == '+')) || (s[count - 2] == '-' && s[count - 3] == '-')));
+				else {
+					error(7, count);
+					return -1;
+				}
+			}
 			if (s[count + 1] == '-') //This is decrement
 			{
 				StackOperator('d', 8); //d for decrement
@@ -70,21 +100,47 @@ int Evaluator::eval(string s)
 		}
 		else if (s[count] == '^') 
 		{
+			//We have to check to see if the one before is a arithmetic operator
+			if (count>0 && (s[count - 1] == '*' || s[count - 1] == '/' || s[count - 1] == '%' || s[count - 1] == '^' || s[count - 1] == '+' || s[count - 1] == '-'))
+			{
+				error(7, count);
+				return -1;
+			}
+			//Account for Spaces
+			if (count>1 && s[count - 1] == ' ' && ((s[count - 2] == '+' || s[count - 2] == '-' || s[count - 2] == '*' || s[count - 2] == '/' || s[count - 2] == '%' || s[count - 2] == '^')))
+			{
+				error(7, count);
+				return -1;
+			}
 			StackOperator(s[count], 7); // ^ has a precedence of 8
 		}
 		else if (s[count] == '*' || s[count] == '/' || s[count] == '%')
 		{
-			//Errors for dividing by 6 
+			//Errors for dividing by 0
 			if ((s[count] == '/') && (s[count + 1] == '0'))
 			{
 				error(6, count+1);
 				return -1;
 			}
+			//acount for spaces
 			if ((s[count] == '/' && ((s[count + 1] == ' ') && (s[count + 2] == '0'))))
 			{
 				error(6, count + 2);
 				return -1;
 			}
+			//We have to check to see if the one before is a arithmetic operator
+			if (count>0 && (s[count - 1] == '*' || s[count - 1] == '/' || s[count - 1] == '%' || s[count - 1] == '^' || s[count - 1] == '+' || s[count - 1] == '-'))
+			{
+				error(7, count);
+				return -1;
+			}
+			//Account for Spaces
+			if (count>1 && s[count - 1] == ' ' && ((s[count - 2] == '+' || s[count - 2] == '-' || s[count - 2] == '*' || s[count - 2] == '/' || s[count - 2] == '%' || s[count - 2] == '^')))
+			{
+				error(7, count);
+				return -1;
+			}
+			
 			StackOperator(s[count], 6);
 		}
 		else if (s[count] == '(')
@@ -307,6 +363,9 @@ void Evaluator::error(int error, int location)
 		break;
 	case 6: // Dividing by 0
 		cout << "Division by zero @ char: " << location << endl;
+		break;
+	case 7: //Two algebra operators in a row
+		cout << "Two arithmetic operators in a row @ char" << location << endl;
 		break;
 	case 10: //If it's just = 
 		cout << "This symbol alone is not a binary operator @ char: " << location << endl;
