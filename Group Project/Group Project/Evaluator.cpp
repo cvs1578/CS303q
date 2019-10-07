@@ -44,14 +44,20 @@ int Evaluator::eval(string s)
 			//We have to check to see if the one before is a arithmetic operator
 			if (count>0&&(s[count - 1] == '*' || s[count - 1] == '/' || s[count - 1] == '%' || s[count - 1] == '^'|| s[count-1] == '+' || s[count-1] == '-'))
 			{
-				error(7, count);
-				return -1;
+				if (count > 1 && ((s[count - 1] == '+' && (s[count - 2] == '+')) || (s[count - 1] == '-' && s[count - 2] == '-'))); //Keeping track of increment/decrement so it'll increment and decrement 
+				else {
+					error(7, count);
+					return -1;
+				}
 			}
 			//Account for Spaces
 			if (count>1 && s[count - 1] == ' ' && ((s[count - 2] == '+' || s[count - 2] == '-' || s[count - 2] == '*' || s[count - 2] == '/' || s[count - 2] == '%' || s[count - 2] == '^')))
 			{
-				error(7, count);
-				return -1;
+				if (count > 2 && ((s[count - 2] == '+' && (s[count - 3] == '+')) || (s[count - 2] == '-' && s[count - 3] == '-')));
+				else {
+					error(7, count);
+					return -1;
+				}
 			}
 			if (s[count + 1] == '+')//This is increment
 			{
@@ -68,7 +74,7 @@ int Evaluator::eval(string s)
 			//We have to check to see if the one before is a arithmetic operator
 			if (count>0 && (s[count - 1] == '*' || s[count - 1] == '/' || s[count - 1] == '%' || s[count - 1] == '^' || s[count - 1] == '+' || s[count - 1] == '-'))
 			{
-				if (count > 1 && ((s[count - 1] == '+' && (s[count - 2] == '+')) || (s[count - 1] == '-' && s[count - 2] == '-'))); //Keeping track of increment/decrement so it'll increment and decrement negative numbers
+				if (count > 1 && ((s[count - 1] == '+' && (s[count - 2] == '+')) || (s[count - 1] == '-' && s[count - 2] == '-'))); //Keeping track of increment/decrement so it'll increment and decrement 
 				else {
 					error(7, count);
 					return -1;
